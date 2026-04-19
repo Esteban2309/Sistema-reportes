@@ -1,0 +1,53 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 226 23% 96%;
+    --foreground: 240 10% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 15%;
+    --primary: 235 62% 27%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 45 93% 53%;
+    --secondary-foreground: 240 10% 15%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 45%;
+    --accent: 235 62% 27%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 235 62% 27%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headline;
+  }
+}
+
+@layer components {
+  .udc-shadow {
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+  .udc-table-header {
+    @apply bg-[#f8f9fd] text-[11px] uppercase tracking-wider text-udc-textMuted font-semibold py-3 px-4;
+  }
+  .udc-table-row {
+    @apply border-b border-udc-border transition-colors hover:bg-[#f8f9fd];
+  }
+}

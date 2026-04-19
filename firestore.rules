@@ -1,0 +1,125 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * CORE PHILOSOPHY
+     * This ruleset implements a dual-layered security model for an academic management system.
+     * 1. Shared Academic Data: Foundational entities (Students, Teachers, Subjects, Grades) are 
+     *    accessible to all authenticated users. This supports the collaborative nature of report 
+     *    generation where various users need access to the full dataset.
+     * 2. Strict User Ownership: Personal data, specifically generated reports, is isolated 
+     *    using a hierarchical path structure (/users/{userId}/...). Access is strictly 
+     *    limited to the owner identified by the URL parameter.
+     *
+     * DATA STRUCTURE
+     * - Top-level collections: /alumnos, /docentes, /materias, /notas (Shared access).
+     * - User-specific subcollections: /users/{userId}/reportes (Private access).
+     *
+     * KEY SECURITY DECISIONS
+     * - Authentication Requirement: No data is exposed to unauthenticated (anonymous or public) 
+     *   users unless specifically required.
+     * - Path-Based Authorization: We prioritize the URL path as the source of truth for 
+     *   ownership to ensure performant, non-filtering queries (QAPs).
+     * - Relational Integrity: On creation, we enforce that internal document fields 
+     *   (like 'generadoPor') match the authenticated user's ID to prevent data spoofing.
+     */
+
+    // --- Global Helper Functions ---
+
+    /**
+     * @description Checks if the request is made by an authenticated user.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user's UID matches the provided userId.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Combines ownership check with document existence check for updates and deletes.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Rules for student records. Shared access for all authenticated users.
+     * @path /alumnos/{alumnoId}
+     * @allow (get) Authenticated user retrieving a student profile.
+     * @deny (list) Unauthenticated guest attempting to browse students.
+     * @principle Authenticated-only access for core academic entities.
+     */
+    match /alumnos/{alumnoId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isSignedIn();
+    }
+
+    /**
+     * @description Rules for teacher records. Shared access for all authenticated users.
+     * @path /docentes/{docenteId}
+     * @allow (create) Authenticated user adding a new teacher record.
+     * @deny (get) Anonymous user trying to access faculty data.
+     * @principle Authenticated-only access for core academic entities.
+     */
+    match /docentes/{docenteId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isSignedIn();
+    }
+
+    /**
+     * @description Rules for academic subjects. Shared access for all authenticated users.
+     * @path /materias/{materiaId}
+     * @allow (list) Authenticated user fetching the course catalog for a report.
+     * @deny (update) Unauthenticated request attempting to modify credits.
+     * @principle Authenticated-only access for core academic entities.
+     */
+    match /materias/{materiaId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isSignedIn();
+    }
+
+    /**
+     * @description Rules for student grades. Shared access for all authenticated users.
+     * @path /notas/{notaId}
+     * @allow (get) Authenticated user viewing specific grade details.
+     * @deny (delete) Request without a valid auth token.
+     * @principle Authenticated-only access for core academic entities.
+     */
+    match /notas/{notaId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isSignedIn();
+    }
+
+    /**
+     * @description Secure container for user-specific data. 
+     * @path /users/{userId}
+     */
+    match /users/{userId} {
+      
+      /**
+       * @description User-owned report history.
+       * @path /users/{userId}/reportes/{reporteId}
+       * @allow (create) User 'A' creating a report inside /users/A/reportes.
+       * @deny (list) User 'A' trying to list reports in /users/B/reportes.
+       * @principle Enforces path-based ownership and relational integrity.
+       */
+      match /reportes/{reporteId} {
+        allow get, list: if isOwner(userId);
+        
+        // Ensure the creator field in the data matches the path and the auth token
+        allow create: if isOwner(userId) && request.resource.data.generadoPor == request.auth.uid;
+        
+        // Ensure ownership and that the record exists before mutation
+        allow update, delete: if isExistingOwner(userId);
+      }
+    }
+  }
+}

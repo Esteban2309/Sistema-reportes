@@ -1,0 +1,322 @@
+{
+  "entities": {
+    "Alumno": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Alumno",
+      "type": "object",
+      "description": "Represents a student enrolled in the Universitaria de Colombia system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Alumno entity."
+        },
+        "nombre": {
+          "type": "string",
+          "description": "The first name of the student."
+        },
+        "apellido": {
+          "type": "string",
+          "description": "The last name of the student."
+        },
+        "codigo": {
+          "type": "string",
+          "description": "The unique student code or identifier assigned by the university."
+        },
+        "programa": {
+          "type": "string",
+          "description": "The academic program or major the student is enrolled in."
+        },
+        "semestre": {
+          "type": "number",
+          "description": "The current academic semester the student is in."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the student.",
+          "format": "email"
+        }
+      },
+      "required": [
+        "id",
+        "nombre",
+        "apellido",
+        "codigo",
+        "programa",
+        "semestre",
+        "email"
+      ]
+    },
+    "Docente": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Docente",
+      "type": "object",
+      "description": "Represents a teacher or faculty member at Universitaria de Colombia.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Docente entity."
+        },
+        "nombre": {
+          "type": "string",
+          "description": "The first name of the teacher."
+        },
+        "apellido": {
+          "type": "string",
+          "description": "The last name of the teacher."
+        },
+        "departamento": {
+          "type": "string",
+          "description": "The academic department the teacher belongs to."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the teacher.",
+          "format": "email"
+        }
+      },
+      "required": [
+        "id",
+        "nombre",
+        "apellido",
+        "departamento",
+        "email"
+      ]
+    },
+    "Materia": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Materia",
+      "type": "object",
+      "description": "Represents an academic subject or course offered by the university.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Materia entity."
+        },
+        "nombre": {
+          "type": "string",
+          "description": "The name of the subject or course."
+        },
+        "creditos": {
+          "type": "number",
+          "description": "The number of academic credits awarded for completing the subject."
+        },
+        "docenteId": {
+          "type": "string",
+          "description": "Reference to the Docente teaching this subject. (Relationship: Docente 1:N Materia)"
+        },
+        "programa": {
+          "type": "string",
+          "description": "The academic program this subject belongs to."
+        }
+      },
+      "required": [
+        "id",
+        "nombre",
+        "creditos",
+        "docenteId",
+        "programa"
+      ]
+    },
+    "Nota": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Nota",
+      "type": "object",
+      "description": "Represents a student's grade for a specific subject in a given period.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Nota entity."
+        },
+        "alumnoId": {
+          "type": "string",
+          "description": "Reference to the Alumno who received this grade. (Relationship: Alumno 1:N Nota)"
+        },
+        "materiaId": {
+          "type": "string",
+          "description": "Reference to the Materia for which this grade was given. (Relationship: Materia 1:N Nota)"
+        },
+        "docenteId": {
+          "type": "string",
+          "description": "Reference to the Docente who taught the subject for this grade. (Relationship: Docente 1:N Nota)"
+        },
+        "periodo": {
+          "type": "string",
+          "description": "The academic period (e.g., '2025-1') in which the grade was awarded."
+        },
+        "corte1": {
+          "type": "number",
+          "description": "The grade obtained in the first evaluation cut (0.0 – 5.0)."
+        },
+        "corte2": {
+          "type": "number",
+          "description": "The grade obtained in the second evaluation cut (0.0 – 5.0)."
+        },
+        "corte3": {
+          "type": "number",
+          "description": "The grade obtained in the third evaluation cut (0.0 – 5.0)."
+        },
+        "definitiva": {
+          "type": "number",
+          "description": "The final calculated grade for the subject (corte1*0.3 + corte2*0.35 + corte3*0.35). (0.0 – 5.0)"
+        },
+        "estado": {
+          "type": "string",
+          "description": "The approval status of the grade, 'Aprobado' or 'Reprobado'."
+        }
+      },
+      "required": [
+        "id",
+        "alumnoId",
+        "materiaId",
+        "docenteId",
+        "periodo",
+        "corte1",
+        "corte2",
+        "corte3",
+        "definitiva",
+        "estado"
+      ]
+    },
+    "Reporte": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Reporte",
+      "type": "object",
+      "description": "Stores a historical record of a generated academic report.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Reporte entity."
+        },
+        "tipo": {
+          "type": "string",
+          "description": "The type of report generated (e.g., 'por_alumno', 'por_materia')."
+        },
+        "parametros": {
+          "type": "string",
+          "description": "A JSON string of parameters used to generate the report (e.g., specific alumnoId, periodo)."
+        },
+        "periodo": {
+          "type": "string",
+          "description": "The academic period relevant to the report (e.g., '2025-1')."
+        },
+        "generadoPor": {
+          "type": "string",
+          "description": "The unique user ID (UID) of the user who generated the report. (Relationship: User 1:N Reporte)"
+        },
+        "fecha": {
+          "type": "string",
+          "description": "The date and time when the report was generated.",
+          "format": "date-time"
+        },
+        "archivoUrl": {
+          "type": "string",
+          "description": "An optional URL where the generated report file can be downloaded.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "tipo",
+        "parametros",
+        "periodo",
+        "generadoPor",
+        "fecha"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/alumnos/{alumnoId}",
+        "definition": {
+          "entityName": "Alumno",
+          "schema": {
+            "$ref": "#/backend/entities/Alumno"
+          },
+          "description": "Stores all student records. Accessible by all authenticated users for report generation. No specific denormalization for authorization needed as access is global for authenticated users.",
+          "params": [
+            {
+              "name": "alumnoId",
+              "description": "The unique identifier of the Alumno."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/docentes/{docenteId}",
+        "definition": {
+          "entityName": "Docente",
+          "schema": {
+            "$ref": "#/backend/entities/Docente"
+          },
+          "description": "Stores all teacher records. Accessible by all authenticated users for report generation. No specific denormalization for authorization needed as access is global for authenticated users.",
+          "params": [
+            {
+              "name": "docenteId",
+              "description": "The unique identifier of the Docente."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/materias/{materiaId}",
+        "definition": {
+          "entityName": "Materia",
+          "schema": {
+            "$ref": "#/backend/entities/Materia"
+          },
+          "description": "Stores all academic subject records. Accessible by all authenticated users for report generation. No specific denormalization for authorization needed as access is global for authenticated users.",
+          "params": [
+            {
+              "name": "materiaId",
+              "description": "The unique identifier of the Materia."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/notas/{notaId}",
+        "definition": {
+          "entityName": "Nota",
+          "schema": {
+            "$ref": "#/backend/entities/Nota"
+          },
+          "description": "Stores all student grade records. Accessible by all authenticated users for report generation. No specific denormalization for authorization needed as access is global for authenticated users.",
+          "params": [
+            {
+              "name": "notaId",
+              "description": "The unique identifier of the Nota."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/reportes/{reporteId}",
+        "definition": {
+          "entityName": "Reporte",
+          "schema": {
+            "$ref": "#/backend/entities/Reporte"
+          },
+          "description": "Stores a historical record of reports generated by a specific user. This structure ensures Authorization Independence and QAPs, as 'generadoPor' (user's UID) is denormalized into the path segment '{userId}'. Only the user matching '{userId}' can access their reports.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who generated the report."
+            },
+            {
+              "name": "reporteId",
+              "description": "The unique identifier of the Reporte."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to adhere strictly to the core design principles and mandates, prioritizing authorization independence, clear intent, DBAC (Database-Backed Access Control), and QAPs (Queries Are Not Filters). 1. Core Academic Data (/alumnos, /docentes, /materias, /notas): These collections store the foundational academic data that is consumed by the report generation module. Structural Segregation: Each collection holds documents of a homogeneous security posture. All 'alumnos' documents have the same access requirements, as do 'docentes', 'materias', and 'notas'. This means rules applied at the collection level are straightforward and consistent. Security Posture: Based on the requirements (\"Only authenticated users can read/write all collections\" for core data), these collections are globally readable by any authenticated user for the purpose of report generation. No direct write operations by end-users are implied for these entities; they are considered administrative data sources. This simplifies rules as they don't need to check specific ownership or roles beyond authentication for this data. Authorization Independence: Since these are top-level collections, they do not depend on parent document attributes for authorization, inherently satisfying this principle. Access is determined solely by the user's authentication status (request.auth.uid being present). QAPs: The ability to query and list documents from these collections (e.g., fetching all 'alumnos' for a dropdown) is fully supported by global read access for authenticated users. The rules are not filtering data but rather granting access to the full dataset for report generation purposes. 2. User-Owned Reports (/users/{userId}/reportes): This subcollection stores the history of reports generated by individual users. Authorization Independence (CRITICAL): This structure is specifically chosen to achieve authorization independence. By using a path 'users/{userId}/reportes/{reporteId}', the 'userId' (representing the authenticated user's UID) is directly embedded in the path. The 'Reporte' entity also explicitly includes a 'generadoPor' field, which will store 'request.auth.uid'. This denormalization means that the security rules for 'reportes' can simply check 'request.auth.uid == userId' without needing any get() operations on parent documents or within the document itself to verify ownership. This enables atomic operations and simplifies debugging. QAPs: This structure perfectly supports QAPs. When a user queries '/users/{request.auth.uid}/reportes', the list operation is inherently secure because the path itself restricts access to only the reports generated by the authenticated user. There is no need for Firestore to \"filter\" results after a broader query; the query itself is scoped correctly by the security rules. Structural Segregation: All documents within a given '/users/{userId}/reportes' subcollection share the same owner (userId) and thus the same security requirements. Path-Based Ownership (Access Modeling): This explicitly follows the recommendation for private, user-owned data by leveraging hierarchical paths. The use of descriptive wildcards ({alumnoId}, {reporteId}, {userId}) enhances clarity and debuggability. All schemas are explicitly referenced, ensuring predictable data structure. The overall design minimizes complexity in security rules, making them robust and easy to audit, as authorization logic is primarily driven by path and simple 'request.auth.uid' checks rather than complex data lookups. The reported error 'auth/api-key-not-valid' is a client-side Firebase configuration issue (missing or invalid NEXT_PUBLIC_FIREBASE_API_KEY) and is unrelated to the Firestore data structure or security rules design. This database structure will function correctly once the Firebase project configuration is properly set up in the Next.js application."
+  }
+}
