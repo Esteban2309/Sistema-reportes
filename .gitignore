@@ -37,9 +37,24 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.genkit/*
+# env files
 .env*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# genkit
+.genkit/
+genkit-state.json
 
 # firebase
-firebase-debug.log
-firestore-debug.log
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+pubsub-debug.log*
+
+# sensitive config
+firebase-applet-config.json
+service-account*.json
